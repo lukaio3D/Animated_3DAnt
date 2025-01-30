@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Ameise Animation</title>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <style>
+        html, body { margin: 0; padding: 0; overflow: hidden; width: 100%; height: 100%; }
+        canvas { width: 100%; height: 100%; display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <div id="buttonsContainer" style="position: absolute; bottom: 0; width: 100%; text-align: center;"></div>
+    <script>
+        // Initialisiere Babylon.js
+        const canvas = document.getElementById("renderCanvas");
+        const engine = new BABYLON.Engine(canvas, true);
+        const scene = new BABYLON.Scene(engine);
+
+        // Kamera hinzufügen
+        const camera = new BABYLON.ArcRotateCamera("camera", Math.PI / 2, Math.PI / 4, 30, BABYLON.Vector3.Zero(), scene);
+        camera.attachControl(canvas, true);
+
+        // Lichtquelle hinzufügen
+        const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+
+        let animationGroups = [];  // Array für die Animationen
+        let currentAnimationIndex = 0;
+        let transitionTime = 0.5;  // Blending-Zeit in Sekunden
+
+        // Lade das GLB-Modell aus dem gleichen Verzeichnis
+        BABYLON.SceneLoader.ImportMesh("", "./", "Phase_01_January27_CombinedActions.glb", scene, function (meshes, particleSystems, skeletons, loadedAnimationGroups) {
+            console.log("Gefundene Animationen:", loadedAnimationGroups.map(a => a.name));
+
+            animationGroups = loadedAnimationGroups;
+
+            if (animationGroups.length > 0) {
+                animationGroups[0].start(true, 1.0, animationGroups[0].from, animationGroups[0].to, false);
+            }
+
+            const container = document.getElementById("buttonsContainer");
+            animationGroups.forEach((group, index) => {
+                const btn = document.createElement("button");
+                btn.textContent = group.name || `Animation ${index}`;
+                btn.onclick = () => {
+                    if (animationGroups[currentAnimationIndex]) {
+                        animationGroups[currentAnimationIndex].stop();
+                    }
+                    currentAnimationIndex = index;
+                    group.enableBlending = true;
+                    group.start(true, 1.0, group.from, group.to, false);
+                };
+                container.appendChild(btn);
+            });
+        });
+
+        // Funktion zum Wechseln der Animation mit Blending
+        function playNextAnimation() {
+            if (animationGroups.length === 0) return;
+
+            let previousAnimation = animationGroups[currentAnimationIndex];
+            currentAnimationIndex = (currentAnimationIndex + 1) % animationGroups.length;
+            let nextAnimation = animationGroups[currentAnimationIndex];
+
+            if (previousAnimation) {
+                previousAnimation.stop();
+            }
+            if (nextAnimation) {
+                nextAnimation.enableBlending = true;
+                nextAnimation.start(true, 1.0, nextAnimation.from, nextAnimation.to, false);
+            }
+        }
+
+        // Render-Loop starten
+        engine.runRenderLoop(() => {
+            scene.render();
+        });
+
+        // Fenstergröße anpassen
+        window.addEventListener("resize", () => {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>
