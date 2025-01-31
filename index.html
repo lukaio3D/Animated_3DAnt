@@ -32,7 +32,7 @@
         let transitionTime = 0.5;  // Blending-Zeit in Sekunden
 
         // Lade das GLB-Modell aus dem gleichen Verzeichnis
-        BABYLON.SceneLoader.ImportMesh("", "./", "Phase_01_January27_CombinedActions.glb", scene, function (meshes, particleSystems, skeletons, loadedAnimationGroups) {
+        BABYLON.SceneLoader.ImportMesh("", "./", "250131_AntAnimated_Phase2.glb", scene, function (meshes, particleSystems, skeletons, loadedAnimationGroups) {
             console.log("Gefundene Animationen:", loadedAnimationGroups.map(a => a.name));
 
             animationGroups = loadedAnimationGroups;
@@ -66,7 +66,8 @@
             let nextAnimation = animationGroups[currentAnimationIndex];
 
             if (previousAnimation) {
-                previousAnimation.stop();
+                previousAnimation.enableBlending = true;
+                previousAnimation.stop( transitionTime );
             }
             if (nextAnimation) {
                 nextAnimation.enableBlending = true;
