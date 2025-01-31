@@ -61,13 +61,13 @@
             function trophalaxis(animationIndex) {
                 ant2.rootNodes[0].position.x = 0;
                 ant2Mesh.isVisible = true;
-                ant2.animationGroups[animationIndex].start();
+                ant2.animationGroups[animationIndex].start(true);
             }
 
             function betrillern(animationIndex) {
                 ant2.rootNodes[0].position.x = -0.6;
                 ant2Mesh.isVisible = true;               
-                ant2.animationGroups[animationIndex].start();
+                ant2.animationGroups[animationIndex].start(true);
             }
 
             const container = document.getElementById("buttonsContainer");
